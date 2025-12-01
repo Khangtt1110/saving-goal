@@ -4,7 +4,9 @@ import SavingGoal from "@/components/SavingGoal.vue";
 
 <template>
     <div class="w-full">
-        <h1 class="text-center text-xl font-normal text-primary mb-6">
+        <h1
+            class="text-center text-lg md:text-xl font-normal text-primary mb-6"
+        >
             Let's plan your
             <span class="font-semibold">saving goal.</span>
         </h1>

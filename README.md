@@ -66,3 +66,4 @@ npm run build
 
 DEMO:
 ![demo image](demo.png)
+![mobile image](mobile.png)

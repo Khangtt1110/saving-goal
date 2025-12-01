@@ -97,21 +97,25 @@ const depositSummary = computed(() => {
 
 <template>
     <div
-        class="w-[560px] flex flex-col gap-6 rounded-lg mx-auto bg-white p-6 shadow-[0_16px_32px_0_#1E2A3214] px-10 pt-8 pb-10"
+        class="w-full md:w-[560px] flex flex-col gap-4 md:gap-6 rounded-lg mx-auto bg-white p-6 shadow-[0_16px_32px_0_#1E2A3214] md:px-10 md:pt-8 md:pb-10"
     >
         <section class="flex gap-4 items-center">
             <img :src="HOUSE" alt="house icon" class="size-16" />
             <div class="flex flex-col gap-1">
-                <h1 class="text-2xl font-rubik font-medium">Buy a house</h1>
-                <span class="font-normal text-base text-[#708797]"
+                <h1 class="text-xl md:text-2xl font-rubik font-medium">
+                    Buy a house
+                </h1>
+                <span class="font-normal text-sm md:text-base text-[#708797]"
                     >Saving goal</span
                 >
             </div>
         </section>
 
-        <section class="flex gap-4">
-            <div class="w-68">
-                <span class="text-sm font-normal mb-1 block">Total amount</span>
+        <section class="flex flex-col md:flex-row gap-4">
+            <div class="w-full md:w-68">
+                <span class="text-xs md:text-sm font-normal mb-1 block"
+                    >Total amount</span
+                >
                 <div class="relative">
                     <span
                         class="absolute inset-y-0 left-3 flex items-center pointer-events-none"
@@ -126,14 +130,16 @@ const depositSummary = computed(() => {
                         @keydown="onKeyDown($event)"
                         pattern="^\d*\.?\d*$"
                         maxlength="10"
-                        class="h-14 w-full pl-11 border border-[#E9EEF2] rounded-sm text-2xl text-[#4D6475] font-medium focus:outline-none"
+                        class="h-14 w-full pl-11 border border-[#E9EEF2] rounded-sm text-xl md:text-2xl text-[#4D6475] font-medium focus:outline-none"
                         placeholder="0.00"
                     />
                 </div>
             </div>
 
             <div class="flex-1">
-                <span class="text-sm font-normal mb-1">Reach goal by</span>
+                <span class="text-xs md:text-sm font-normal mb-1"
+                    >Reach goal by</span
+                >
                 <div
                     class="h-14 w-full border justify-between border-[#E9EEF2] rounded-sm flex focus:outline-none"
                     ref="reachDateRef"
@@ -145,7 +151,9 @@ const depositSummary = computed(() => {
                     >
                         <img :src="LEFT" alt="house icon" class="size-6" />
                     </button>
-                    <div class="flex flex-col items-center justify-center">
+                    <div
+                        class="flex flex-col items-center justify-center text-sm md:text-base"
+                    >
                         <h3 class="font-semibold">
                             {{ store.reachDateDisplay.month }}
                         </h3>
@@ -162,16 +170,20 @@ const depositSummary = computed(() => {
         </section>
 
         <section class="w-full border-[#E9EEF2] border rounded-lg">
-            <div class="flex justify-between items-center px-8 pt-6 pb-4">
-                <h1 class="text-xl font-normal">Monthly amount</h1>
-                <h2 class="font-rubik font-medium text-[32px] text-secondary">
+            <div
+                class="flex justify-between items-center p-6 md:px-8 md:pt-6 md:pb-4"
+            >
+                <h1 class="text-lg md:text-xl font-normal">Monthly amount</h1>
+                <h2
+                    class="font-rubik font-medium text-2xl md:text-[32px] text-secondary"
+                >
                     ${{ formatMoneyDisplay(store.currentGoal.monthlyAmount) }}
                 </h2>
             </div>
 
-            <div class="w-full bg-background py-6 px-8">
+            <div class="w-full bg-background p-6 md:py-6 md:px-8">
                 <p
-                    class="text-xs font-normal"
+                    class="text-xs font-normal text-center"
                     v-html="store.depositSummary"
                 ></p>
             </div>
@@ -179,7 +191,7 @@ const depositSummary = computed(() => {
 
         <button
             @click="store.calculateMonthly()"
-            class="w-80 h-14 cursor-pointer mt-2 mx-auto bg-primary text-white font-semibold rounded-4xl hover-scale"
+            class="w-80 h-14 cursor-pointer mt-4 md:mt-2 mx-auto bg-primary text-white font-semibold rounded-4xl hover-scale"
         >
             Confirm
         </button>
