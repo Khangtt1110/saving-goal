@@ -3,7 +3,8 @@
 /* Custom theme variables */
 @theme {
     /* Fonts */
-    --font-sans: "Inter", ui-sans-serif, system-ui;
+    --font-sans: "Work Sans", ui-sans-serif, system-ui;
+    --font-rubik: "Rubik", ui-sans-serif, system-ui;
 
     /* Colors */
     --color-primary: #1b31a8;

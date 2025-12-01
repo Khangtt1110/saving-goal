@@ -8,7 +8,9 @@ import Header from "@/components/commons/Header.vue";
         <Header />
 
         <!-- Main content -->
-        <main class="flex-1 p-6 pt-20 bg-background h-full w-screen">
+        <main
+            class="font-sans flex-1 p-6 pt-20 bg-background h-full w-screen mt-12"
+        >
             <router-view />
         </main>
     </div>
