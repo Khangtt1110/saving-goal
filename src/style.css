@@ -11,3 +11,11 @@
     --color-secondary: #0079ff;
     --color-background: #f4f8fa;
 }
+
+.hover-scale {
+    @apply transition-transform duration-300 ease-in-out;
+}
+
+.hover-scale:hover {
+    @apply scale-110;
+}

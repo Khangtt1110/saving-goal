@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useSavingGoalStore } from "@/stores/savingGoalStore";
+import { formatMoneyDisplay } from "@/utils/price";
 import { formatMonthYear } from "@/utils/date";
 
 // Assets
@@ -10,12 +11,88 @@ import LEFT from "@/assets/svgs/saving/left-arrow.svg";
 import RIGHT from "@/assets/svgs/saving/right-arrow.svg";
 
 const store = useSavingGoalStore();
+const reachDateRef = ref<HTMLDivElement | null>(null);
 
-const reachDate = ref(new Date());
+const onInput = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const sanitized = target.value.replace(/[^\d.]/g, "");
+    store.updateTotalAmountFromInput(sanitized);
+};
 
-const reachDateDisplay = computed(() =>
-    formatMonthYear(reachDate.value, { month: "long" }),
-);
+const increment = () => {
+    store.incrementMonth();
+    // Avoid ref out of container
+    reachDateRef.value?.focus();
+};
+
+const decrement = () => {
+    store.decrementMonth();
+    reachDateRef.value?.focus();
+};
+
+// Handle ref for container
+const handleKeyDown = (event: KeyboardEvent) => {
+    if (!reachDateRef.value) return;
+
+    const isFocused = document.activeElement === reachDateRef.value;
+    if (!isFocused) return;
+
+    switch (event.key) {
+        case "ArrowLeft":
+            event.preventDefault();
+            decrement();
+            break;
+        case "ArrowRight":
+            event.preventDefault();
+            increment();
+            break;
+    }
+};
+
+// Just allow number and dots
+const onKeyDown = (e: KeyboardEvent) => {
+    const allowedKeys = [
+        "Backspace",
+        "Tab",
+        "ArrowLeft",
+        "ArrowRight",
+        "Delete",
+    ];
+
+    if (/[0-9]/.test(e.key) || allowedKeys.includes(e.key)) {
+        return;
+    }
+
+    if (e.key === ".") {
+        const target = e.target as HTMLInputElement;
+        if (!target.value.includes(".")) return;
+    }
+
+    e.preventDefault();
+};
+
+onMounted(() => {
+    window.addEventListener("keydown", handleKeyDown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleKeyDown);
+});
+
+const depositSummary = computed(() => {
+    const goal = store.currentGoal;
+    const months = store.totalMonths;
+    const total = formatMoneyDisplay(goal.totalAmount);
+
+    const targetMonth = goal.reachDate
+        ? formatMonthYear(goal.reachDate, { month: "long" }).month
+        : "";
+    const targetYear = goal.reachDate
+        ? formatMonthYear(goal.reachDate, { month: "long" }).year
+        : "";
+
+    return `You’re planning <strong>${months} monthly deposits</strong> to reach your <strong>$${total}</strong> goal by <strong>${targetMonth} ${targetYear}</strong>.`;
+});
 </script>
 
 <template>
@@ -44,6 +121,11 @@ const reachDateDisplay = computed(() =>
 
                     <input
                         type="text"
+                        :value="store.currentGoal.totalAmountInput"
+                        @input="onInput($event)"
+                        @keydown="onKeyDown($event)"
+                        pattern="^\d*\.?\d*$"
+                        maxlength="10"
                         class="h-14 w-full pl-11 border border-[#E9EEF2] rounded-sm text-2xl text-[#4D6475] font-medium focus:outline-none"
                         placeholder="0.00"
                     />
@@ -53,18 +135,26 @@ const reachDateDisplay = computed(() =>
             <div class="flex-1">
                 <span class="text-sm font-normal mb-1">Reach goal by</span>
                 <div
-                    class="h-14 w-full border justify-between border-[#E9EEF2] rounded-sm flex gap-2.5"
+                    class="h-14 w-full border justify-between border-[#E9EEF2] rounded-sm flex focus:outline-none"
+                    ref="reachDateRef"
+                    tabindex="0"
                 >
-                    <button class="grid place-items-center w-12 cursor-pointer">
+                    <button
+                        @click="decrement"
+                        class="grid place-items-center w-12 cursor-pointer focus:outline-none hover-scale"
+                    >
                         <img :src="LEFT" alt="house icon" class="size-6" />
                     </button>
                     <div class="flex flex-col items-center justify-center">
                         <h3 class="font-semibold">
-                            {{ reachDateDisplay.month }}
+                            {{ store.reachDateDisplay.month }}
                         </h3>
-                        <p>{{ reachDateDisplay.year }}</p>
+                        <p>{{ store.reachDateDisplay.year }}</p>
                     </div>
-                    <button class="grid place-items-center w-12 cursor-pointer">
+                    <button
+                        @click="increment"
+                        class="grid place-items-center w-12 cursor-pointer focus:outline-none hover-scale"
+                    >
                         <img :src="RIGHT" alt="house icon" class="size-6" />
                     </button>
                 </div>
@@ -75,19 +165,21 @@ const reachDateDisplay = computed(() =>
             <div class="flex justify-between items-center px-8 pt-6 pb-4">
                 <h1 class="text-xl font-normal">Monthly amount</h1>
                 <h2 class="font-rubik font-medium text-[32px] text-secondary">
-                    $520.83
+                    ${{ formatMoneyDisplay(store.currentGoal.monthlyAmount) }}
                 </h2>
             </div>
+
             <div class="w-full bg-background py-6 px-8">
-                <p class="text-xs font-normal">
-                    You’re planning 48 monthly deposits to reach your $25,000
-                    goal by October 2020.
-                </p>
+                <p
+                    class="text-xs font-normal"
+                    v-html="store.depositSummary"
+                ></p>
             </div>
         </section>
 
         <button
-            class="w-80 h-14 cursor-pointer mt-2 mx-auto bg-primary text-white font-semibold rounded-4xl"
+            @click="store.calculateMonthly()"
+            class="w-80 h-14 cursor-pointer mt-2 mx-auto bg-primary text-white font-semibold rounded-4xl hover-scale"
         >
             Confirm
         </button>

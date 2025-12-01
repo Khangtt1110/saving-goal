@@ -10,3 +10,9 @@ export function formatMonthYear(
         year: date.getFullYear(),
     };
 }
+
+export function getNextMonthDate(): Date {
+    const today = new Date();
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    return nextMonth;
+}

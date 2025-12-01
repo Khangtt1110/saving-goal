@@ -2,6 +2,7 @@ export interface SavingGoal {
     id: string;
     name: string;
     totalAmount: number;
-    reachDate: string;
+    totalAmountInput?: string;
+    reachDate: Date | null;
     monthlyAmount: number;
 }
